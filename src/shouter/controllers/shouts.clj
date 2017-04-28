@@ -3,11 +3,12 @@
             [clojure.string :as str]
             [clojure.data.json :as json]
             [ring.util.response :as ring]
+            [ring.middleware.anti-forgery :refer :all]
             [shouter.views.shouts :as view]
             [shouter.models.shout :as model]))
 
-(defn index []
-  (view/index (model/all)))
+(defn index [token]
+  (view/index (model/all) token))
 
 (defn value-reader [key value]
   (if (= key :created_at)
@@ -28,7 +29,7 @@
   (index-json))
 
 (defroutes routes
-  (GET "/" [] (index))
+  (GET "/" [] (index *anti-forgery-token*))
   (GET "/shouts.json" [] (index-json))
   (POST "/" [shout] (create shout))
   (POST "/new" [shout] (create-json shout)))

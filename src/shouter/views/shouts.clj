@@ -1,26 +1,31 @@
 (ns shouter.views.shouts
   (:require [shouter.views.layout :as layout]
-            [hiccup.core :refer [h]]
-            [hiccup.form :as form]
-            [ring.util.anti-forgery :as anti-forgery]))
+            [rum.core :as rum]))
 
-(defn shout-form []
+(rum/defc shout-form [token]
   [:div {:id "shout-form"
          :class "sixteen columns alpha omega"}
-   (form/form-to [:post "/"]
-                 (anti-forgery/anti-forgery-field)
-                 (form/label "shout" "What do you want to SHOUT?")
-                 (form/text-area "shout")
-                 (form/submit-button "SHOUT!"))])
+   [:form {:method "POST"
+           :action "/"}
+    [:input {:type "hidden"
+             :name "__anti-forgery-token"
+             :value token}]
+    [:label "What do you want to SHOUT?"]
+    [:textarea {:name "shout"}]
+    [:input {:type "submit"
+             :value "SHOUT!"}]]])
 
-(defn display-shouts [shouts]
-  [:div {:class "shouts sixteen columns alpha omega"}
-   (map
-     (fn [shout] [:h2 {:class "shout"} (h (:body shout))])
-     shouts)])
+(rum/defc shouts-list-item [shout]
+  [:h2 {:class "shout"} (:body shout)])
+(rum/defc shouts-list [shouts]
+  [:div (map shouts-list-item shouts)])
 
-(defn index [shouts]
+(rum/defc app [shouts token]
+  [:div
+   (shout-form token)
+   (shouts-list shouts)])
+
+(defn index [shouts token]
   (layout/common "SHOUTER"
-                 (shout-form)
-                 [:div {:class "clear"}]
-                 (display-shouts shouts)))
+                 (rum/render-static-markup
+                   (app shouts token))))
