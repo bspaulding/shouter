@@ -5,15 +5,12 @@
             [ring.util.response :as ring]
             [ring.middleware.anti-forgery :refer :all]
             [shouter.views.shouts :as view]
-            [shouter.models.shout :as model]))
+            [shouter.models.shout :as model]
+            [shouter.json :refer [value-reader]]))
 
 (defn index [token]
   (view/index (model/all) token))
 
-(defn value-reader [key value]
-  (if (= key :created_at)
-    (.getTime value)
-    value))
 (defn index-json []
   (json/write-str (model/all)
                   :value-fn value-reader))
