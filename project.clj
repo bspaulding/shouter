@@ -16,7 +16,13 @@
                  [hiccup "1.0.5"]]
   :main ^:skip-aot shouter.web
   :uberjar-name "shouter-standalone.jar"
-  :plugins [[lein-ring "0.8.13"]]
+  :plugins [[lein-ring "0.8.13"]
+            [lein-cljsbuild "1.1.6"]]
+  :cljsbuild {:builds [{:source-paths ["src"]
+                        :compiler {:main "shouter.client"
+                                   :output-to "resources/public/bundle.js"
+                                   :optimizations :advanced
+                                   :pretty-print true}}]}
   :ring {:handler shouter.web/application
          :init shouter.models.migration/migrate}
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
