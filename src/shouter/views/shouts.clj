@@ -26,6 +26,8 @@
    (shouts-list shouts)])
 
 (defn index [shouts token]
-  (layout/common "SHOUTER"
-                 (rum/render-static-markup
-                   (app shouts token))))
+  (let [state {:shouts shouts
+               :token token}]
+    (layout/common "SHOUTER"
+                   state
+                   (rum/render-static-markup (app state)))))
